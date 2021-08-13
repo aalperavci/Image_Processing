@@ -1,0 +1,40 @@
+import numpy as np
+import skimage.io
+import matplotlib.pyplot as plt
+
+img=skimage.io.imread("1-2-3-4-5.jpg")
+img=skimage.color.rgb2gray(img)
+
+def gauss(k,l,sig):
+    gauss=np.zeros((k,l))
+    k=k//2
+    l=l//2
+    for x in range(-k,k+1):
+        for y in range(-l,l+1):
+            x1=(sig**2)*np.sqrt((2*np.pi))
+            x2=np.exp(-(x**2+y**2)/(2*sig**2))
+            gauss[x+k,y+l]=(1/x1)*x2
+    return gauss
+
+
+def islem(put1,put2):
+    r,c=put1.shape
+    m,n=put2.shape
+    newlab = np.zeros((r + m - 1, c + n - 1))
+    n=n//2
+    m=m//2
+    filtimg = np.zeros((r,c))
+    newlab[m:newlab.shape[0] - m, n:newlab.shape[1] - n]=put1
+    for i in range(m, newlab.shape[0] - m):
+        for j in range(n, newlab.shape[1] - n):
+            temp = newlab[i - m:i + m + 1, j - m:j + m + 1]
+            result = temp * put2
+            filtimg[i - m, j - n] = result.sum()
+    return filtimg
+
+g=gauss(5,5,20)
+n=islem(img,g)
+plt.imshow(img)
+plt.figure()
+plt.imshow(n)
+plt.show()
