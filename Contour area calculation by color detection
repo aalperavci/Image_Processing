@@ -1,0 +1,40 @@
+import cv2
+import numpy as np
+import imutils
+import math
+import matplotlib.pyplot as plt
+
+image=cv2.imread("1-2-3-4-5.jpg")
+hsv=cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
+lower_black = np.array([0,0,77])
+upper_black = np.array([179,7,255])
+mask = cv2.inRange(hsv,lower_black, upper_black)
+kernel = np.ones((5,5),np.uint8)
+dil = cv2.dilate(mask,kernel,iterations=4)
+mask2 =cv2.erode(dil,kernel,iterations = 3)
+cv2.imshow("mask",mask2)
+
+
+m,n=mask2.shape
+totalarea=m*n
+print("total area: ",totalarea)
+
+img_edges = cv2.Canny(mask2,100,200, apertureSize=3)
+cv2.imshow("canny",img_edges)
+
+cnts=cv2.findContours(img_edges,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+cnts=imutils.grab_contours(cnts)
+
+for c in cnts:
+    area=cv2.contourArea(c)
+    if area >1000:
+        cv2.drawContours(image,[c],-1,(0,255,0),2)
+
+        cv2.imshow("im",image)
+        print("area is :",area)
+
+        backgroundarea=totalarea-area
+        print("background area: ",backgroundarea)
+
+
+cv2.waitKey(0)
